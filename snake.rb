@@ -51,7 +51,7 @@ height = lines
 game_speed = 0.2
 make_food(height, width)
 start_time = Time.now.to_i
-speed_incremented = 0
+speed_incremented = false
 display_speed = 0
 game_score = 0
 
@@ -117,13 +117,14 @@ begin
 		change_of_dir
 
 		#set speed of play, increment it automatically
-		if ((snake_len % 10 == 0) or ((current_time-start_time)%60 == 0)) and speed_incremented == 0
-			game_speed -= (game_speed*0.10) unless game_speed < 0.05
-			speed_incremented = 1
-			display_speed += 1
-		end
-		if (snake_len % 10 != 0) and ((current_time-start_time)%60 != 0)
-			speed_incremented = 0
+		if ((snake_len % 10 == 0) or ((current_time-start_time)%60 == 0))
+			if speed_incremented == false
+				game_speed -= (game_speed*0.10) unless game_speed < 0.05
+				speed_incremented = true
+				display_speed += 1
+			end
+		else
+			speed_incremented = false
 		end
 
 		if @dir == 2 or @dir == 1
