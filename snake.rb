@@ -63,7 +63,6 @@ begin
 
 
 		win.box("|", "-")
-		win.refresh
 
 		win.setpos(@food_x, @food_y)
 		win.addstr("#")
@@ -107,7 +106,6 @@ begin
 		for t in 0..snake_len+1
 			setpos(pos_x[t],pos_y[t])
 			addstr(t == 1 ? "*" : "+")			
-			win.refresh
 		end
 
 		change_of_dir
@@ -147,6 +145,7 @@ begin
 			snake_len += 1
 			game_score += 1*display_speed
 		end
+		win.refresh
 		win.clear
 	end
 ensure
