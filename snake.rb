@@ -55,6 +55,7 @@ speed_incremented = 0
 display_speed = 0
 game_score = 0
 
+
 begin
 	loop do
 		win = Window.new(height, width, (lines - height)/2, (cols - width)/2) #set the playfield the size of current terminal window
