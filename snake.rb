@@ -58,6 +58,9 @@ game_score = 0
 
 begin
 	loop do
+
+		current_time = Time.now.to_i
+
 		win = Window.new(height, width, (lines - height)/2, (cols - width)/2) #set the playfield the size of current terminal window
 		win.box("|", "-")
 		win.refresh
@@ -72,13 +75,13 @@ begin
 		win.addstr(title)
 
 		win.setpos(0,width-12)
-		win.addstr("Time: " + (Time.now.to_i - start_time).to_s)
+		win.addstr("Time: " + (current_time - start_time).to_s)
 
 		win.setpos(height-1,3)
 		win.addstr("Speed: " + display_speed.to_s)
 
 		win.setpos(height-1,width-12)
-		win.addstr("Score: " + (game_score-(Time.now.to_i - start_time)/10.round(0)).to_s)
+		win.addstr("Score: " + (game_score-(current_time - start_time)/10.round(0)).to_s)
 
 		#change direction of movement
 		case @dir
@@ -114,12 +117,12 @@ begin
 		change_of_dir
 
 		#set speed of play, increment it automatically
-		if ((snake_len % 10 == 0) or ((Time.now.to_i-start_time)%60 == 0)) and speed_incremented == 0
+		if ((snake_len % 10 == 0) or ((current_time-start_time)%60 == 0)) and speed_incremented == 0
 			game_speed -= (game_speed*0.10) unless game_speed < 0.05
 			speed_incremented = 1
 			display_speed += 1
 		end
-		if (snake_len % 10 != 0) and ((Time.now.to_i-start_time)%60 != 0)
+		if (snake_len % 10 != 0) and ((current_time-start_time)%60 != 0)
 			speed_incremented = 0
 		end
 
