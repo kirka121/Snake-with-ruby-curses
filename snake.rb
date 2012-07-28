@@ -144,8 +144,8 @@ begin
 		end
 
 		#check collision with self
-		for t in 2..snake_len
-			if pos_y[0] == pos_y[t] and pos_x[0] == pos_x[t]
+		for i in 2..snake_len
+			if pos_y[0] == pos_y[i] and pos_x[0] == pos_x[i]
 				end_game
 			end
 		end
