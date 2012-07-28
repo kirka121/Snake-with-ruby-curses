@@ -134,12 +134,7 @@ begin
 		end
 
 		#check collision with border
-		case pos_y[0]
-		when cols-1, 0
-			end_game
-		end
-		case pos_x[0]
-		when lines-1, 0
+		if pos_y[0] == cols-1 or pos_y[0] == 0 or pos_x[0] == lines-1 or pos_x[0] == 0
 			end_game
 		end
 
