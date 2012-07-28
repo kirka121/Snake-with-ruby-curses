@@ -106,11 +106,7 @@ begin
 		#draw the snake and its tail
 		for t in 0..snake_len+1
 			setpos(pos_x[t],pos_y[t])
-			if t == 1
-				addstr("*")
-			else
-				addstr("+")
-			end
+			addstr(t == 1 ? "*" : "+")			
 			win.refresh
 		end
 
