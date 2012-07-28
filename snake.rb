@@ -54,14 +54,14 @@ start_time = Time.now.to_i
 speed_incremented = false
 display_speed = 0
 game_score = 0
-
+win = Window.new(height, width, (lines - height)/2, (cols - width)/2) #set the playfield the size of current terminal window
 
 begin
 	loop do
 
 		current_time = Time.now.to_i
 
-		win = Window.new(height, width, (lines - height)/2, (cols - width)/2) #set the playfield the size of current terminal window
+
 		win.box("|", "-")
 		win.refresh
 
@@ -151,7 +151,7 @@ begin
 			snake_len += 1
 			game_score += 1*display_speed
 		end
-		win.close
+		win.clear
 	end
 ensure
 	close_screen
