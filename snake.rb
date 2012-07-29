@@ -54,7 +54,7 @@ start_time = Time.now.to_i
 speed_incremented = false
 display_speed = 0
 game_score = 0
-win = Window.new(height, width, (lines - height)/2, (cols - width)/2) #set the playfield the size of current terminal window
+win = Window.new(height, width, 0, 0) #set the playfield the size of current terminal window
 
 begin
 	loop do
