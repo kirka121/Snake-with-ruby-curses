@@ -83,14 +83,10 @@ begin
 
 		#change direction of movement
 		case @dir
-		when :up
-			pos_x[0] -= 1
-		when :down
-			pos_x[0] += 1
-		when :left
-			pos_y[0] -= 1
-		when :right
-			pos_y[0] += 1
+		when :up    then pos_x[0] -= 1
+		when :down  then pos_x[0] += 1
+		when :left  then pos_y[0] -= 1
+		when :right then pos_y[0] += 1
 		end
 
 		#remember the tail position during movement
