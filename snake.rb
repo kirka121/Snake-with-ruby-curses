@@ -59,8 +59,7 @@ win = Window.new(height, width, (lines - height)/2, (cols - width)/2) #set the p
 begin
 	loop do
 
-		current_time = Time.now.to_i
-
+		time_offset = Time.now.to_i - start_time
 
 		win.box("|", "-")
 
@@ -74,13 +73,13 @@ begin
 		win.addstr(title)
 
 		win.setpos(0,width-12)
-		win.addstr("Time: " + (current_time - start_time).to_s)
+		win.addstr("Time: " + time_offset.to_s)
 
 		win.setpos(height-1,3)
 		win.addstr("Speed: " + display_speed.to_s)
 
 		win.setpos(height-1,width-12)
-		win.addstr("Score: " + (game_score-(current_time - start_time)/10.round(0)).to_s)
+		win.addstr("Score: " + (game_score-(time_offset)/10.round(0)).to_s)
 
 		#change direction of movement
 		case @dir
@@ -111,7 +110,7 @@ begin
 		change_of_dir
 
 		#set speed of play, increment it automatically
-		if ((snake_len % 10 == 0) or ((current_time-start_time)%60 == 0))
+		if ((snake_len % 10 == 0) or (time_offset%60 == 0))
 			if speed_incremented == false
 				game_speed -= (game_speed*0.10) unless game_speed < 0.05
 				speed_incremented = true
