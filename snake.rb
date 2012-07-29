@@ -20,7 +20,7 @@ class Snake
 	def check_wall_collision
 		#check collision with border
 		if @pos_y[0] == @width-1 or @pos_y[0] == 0 or @pos_x[0] == @height-1 or @pos_x[0] == 0
-			GamePlay::end_of_game
+			GamePlay.end_of_game
 		end
 	end
 
@@ -28,7 +28,7 @@ class Snake
 		#check collision with self
 		for i in 2..snake_len
 			if @pos_y[0] == @pos_y[i] and @pos_x[0] == @pos_x[i]
-				GamePlay::end_of_game
+				GamePlay.end_of_game
 			end
 		end
 	end
@@ -92,9 +92,10 @@ class GamePlay < Snake
 			@pause = @pause ? false : true
 			if @pause
 				sleep(0.5)
-				next
+				#next
 			end
 		end
+	end
 
 	def change_direction_update
 		case @dir
@@ -141,33 +142,32 @@ curs_set(0)					#the cursor is invisible.
 #starting position
 title = "Kirka's Snake"
 start_time = Time.now.to_i
-speed_incremented = false
 display_speed = 0
 win = Window.new(lines, cols, 0, 0) #set the playfield the size of current terminal window
 
 begin
 	loop do
-		Snake.new
-		GamePay.new
+		snake = Snake.new
+		game = GamePlay.new
 
 		time_offset = Time.now.to_i - start_time
 
 		win.box("|", "-")
 
-		win.setpos(0,width/2-title.length/2)
+		win.setpos(0,cols/2-title.length/2)
 		win.addstr(title)
 
-		win.setpos(0,width-12)
+		win.setpos(0,cols-12)
 		win.addstr("Time: " + time_offset.to_s)
 
-		Snake::draw_snake
-		GamePlay::change_direction_detect
-		GamePlay::speed_of_game(time_offset)
-		GamePlay::change_direction_update
-		Snake::check_wall_collision
-		Snake::check_self_collision
-		Snake::check_food_eaten(time_offset)
-		GamePlay::proper_delay
+		snake.draw_snake
+		game.change_direction_detect
+		game.speed_of_game(time_offset)
+		game.change_direction_update
+		snake.check_wall_collision
+		snake.check_self_collision
+		snake.check_food_eaten(time_offset)
+		game.proper_delay
 
 		win.refresh
 		win.clear
