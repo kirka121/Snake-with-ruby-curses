@@ -24,8 +24,8 @@ def change_of_dir
 end
 
 def end_game
-	exit
 	puts "You LOST".red
+	exit
 end
 
 def make_food(max_h, max_w)
