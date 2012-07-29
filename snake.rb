@@ -64,6 +64,8 @@ class Snake
 	def make_food(max_h, max_w)
 		@food_y = rand(2..max_w-2)
 		@food_x = rand(1..max_h-2)
+		setpos(@food_x, @food_y)
+		addstr("#")
 	end
 end
 
@@ -151,9 +153,6 @@ begin
 		time_offset = Time.now.to_i - start_time
 
 		win.box("|", "-")
-
-		win.setpos(@food_x, @food_y)
-		win.addstr("#")
 
 		win.setpos(0,width/2-title.length/2)
 		win.addstr(title)
