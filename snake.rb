@@ -17,7 +17,7 @@ def change_of_dir
 	when ?A, ?a
 		@dir = :left if @dir != :right
 	when ?P, ?p
-		#pause goes here...
+		@pause = @pause ? false : true
 	else 
 		@dir
 	end
@@ -45,6 +45,7 @@ title = "Kirka's Snake"
 pos_y = [5,4,3,2,1]
 pos_x = [1,1,1,1,1]
 @dir = :right
+@pause = false
 snake_len = 3
 width = cols
 height = lines
@@ -58,6 +59,13 @@ win = Window.new(height, width, 0, 0) #set the playfield the size of current ter
 
 begin
 	loop do
+
+		change_of_dir
+
+		if @pause
+			sleep(0.5)
+			next
+		end
 
 		time_offset = Time.now.to_i - start_time
 
@@ -100,10 +108,8 @@ begin
 		#draw the snake and its tail
 		for t in 0..snake_len+1
 			setpos(pos_x[t],pos_y[t])
-			addstr(t == 1 ? "*" : "+")			
+			addstr(t == 1 ? "*" : "+")
 		end
-
-		change_of_dir
 
 		#set speed of play, increment it automatically
 		if ((snake_len % 10 == 0) or (time_offset%60 == 0))
