@@ -9,13 +9,13 @@ def change_of_dir
 	when ?Q, ?q
 		exit
 	when ?W, ?w
-		@dir = 1 if @dir != 2
+		@dir = :up if @dir != :down
 	when ?S, ?s
-		@dir = 2 if @dir != 1
+		@dir = :down if @dir != :up
 	when ?D, ?d
-		@dir = 4 if @dir != 3
+		@dir = :right if @dir != :left
 	when ?A, ?a
-		@dir = 3 if @dir != 4
+		@dir = :left if @dir != :right
 	when ?P, ?p
 		#pause goes here...
 	else 
@@ -44,7 +44,7 @@ curs_set(0)					#the cursor is invisible.
 title = "Kirka's Snake"
 pos_y = [5,4,3,2,1]
 pos_x = [1,1,1,1,1]
-@dir = 4 #1 = up, 2 = down, 3 = left, 4 = right
+@dir = :right #1 = up, 2 = down, 3 = left, 4 = right
 snake_len = 3
 width = cols
 height = lines
@@ -83,13 +83,13 @@ begin
 
 		#change direction of movement
 		case @dir
-		when 1
+		when :up
 			pos_x[0] -= 1
-		when 2
+		when :down
 			pos_x[0] += 1
-		when 3
+		when :left
 			pos_y[0] -= 1
-		when 4
+		when :right
 			pos_y[0] += 1
 		end
 
@@ -120,7 +120,7 @@ begin
 			speed_incremented = false
 		end
 
-		sleep( @dir > 2 ? game_speed/2 : game_speed)
+		sleep( (@dir == :left or @dir == :right) ? game_speed/2 : game_speed)
 
 		#check collision with border
 		if pos_y[0] == cols-1 or pos_y[0] == 0 or pos_x[0] == lines-1 or pos_x[0] == 0
