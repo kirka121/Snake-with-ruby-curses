@@ -24,8 +24,8 @@ def change_of_dir
 end
 
 def end_game
-	exit
 	puts "You LOST".red
+	exit
 end
 
 def make_food(max_h, max_w)
@@ -51,16 +51,17 @@ height = lines
 game_speed = 0.2
 make_food(height, width)
 start_time = Time.now.to_i
-speed_incremented = 0
+speed_incremented = false
 display_speed = 0
 game_score = 0
-
+win = Window.new(height, width, (lines - height)/2, (cols - width)/2) #set the playfield the size of current terminal window
 
 begin
 	loop do
-		win = Window.new(height, width, (lines - height)/2, (cols - width)/2) #set the playfield the size of current terminal window
+
+		time_offset = Time.now.to_i - start_time
+
 		win.box("|", "-")
-		win.refresh
 
 		win.setpos(@food_x, @food_y)
 		win.addstr("#")
@@ -72,13 +73,13 @@ begin
 		win.addstr(title)
 
 		win.setpos(0,width-12)
-		win.addstr("Time: " + (Time.now.to_i - start_time).to_s)
+		win.addstr("Time: " + time_offset.to_s)
 
 		win.setpos(height-1,3)
 		win.addstr("Speed: " + display_speed.to_s)
 
 		win.setpos(height-1,width-12)
-		win.addstr("Score: " + (game_score-(Time.now.to_i - start_time)/10.round(0)).to_s)
+		win.addstr("Score: " + (game_score-(time_offset)/10.round(0)).to_s)
 
 		#change direction of movement
 		case @dir
@@ -103,45 +104,32 @@ begin
 		#draw the snake and its tail
 		for t in 0..snake_len+1
 			setpos(pos_x[t],pos_y[t])
-			if t == 1
-				addstr("*")
-			else
-				addstr("+")
-			end
-			win.refresh
+			addstr(t == 1 ? "*" : "+")			
 		end
 
 		change_of_dir
 
 		#set speed of play, increment it automatically
-		if ((snake_len % 10 == 0) or ((Time.now.to_i-start_time)%60 == 0)) and speed_incremented == 0
-			game_speed -= (game_speed*0.10) unless game_speed < 0.05
-			speed_incremented = 1
-			display_speed += 1
-		end
-		if (snake_len % 10 != 0) and ((Time.now.to_i-start_time)%60 != 0)
-			speed_incremented = 0
+		if ((snake_len % 10 == 0) or (time_offset%60 == 0))
+			if speed_incremented == false
+				game_speed -= (game_speed*0.10) unless game_speed < 0.05
+				speed_incremented = true
+				display_speed += 1
+			end
+		else
+			speed_incremented = false
 		end
 
-		if @dir == 2 or @dir == 1
-			sleep(game_speed)
-		elsif @dir == 3 or @dir == 4
-			sleep(game_speed/2)
-		end
+		sleep( @dir > 2 ? game_speed/2 : game_speed)
 
 		#check collision with border
-		case pos_y[0]
-		when cols-1, 0
-			end_game
-		end
-		case pos_x[0]
-		when lines-1, 0
+		if pos_y[0] == cols-1 or pos_y[0] == 0 or pos_x[0] == lines-1 or pos_x[0] == 0
 			end_game
 		end
 
 		#check collision with self
-		for t in 2..snake_len
-			if pos_y[0] == pos_y[t] and pos_x[0] == pos_x[t]
+		for i in 2..snake_len
+			if pos_y[0] == pos_y[i] and pos_x[0] == pos_x[i]
 				end_game
 			end
 		end
@@ -152,7 +140,8 @@ begin
 			snake_len += 1
 			game_score += 1*display_speed
 		end
-		win.close
+		win.refresh
+		win.clear
 	end
 ensure
 	close_screen
