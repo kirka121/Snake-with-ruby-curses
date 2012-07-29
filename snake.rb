@@ -13,6 +13,7 @@ class Snake
 		@game_speed = 0.2
 		@game_score = 0
 		@display_speed = 0
+		make_food(@height,@width)
 	end
 
 	def check_wall_collision
@@ -137,8 +138,7 @@ win = Window.new(lines, cols, 0, 0) #set the playfield the size of current termi
 
 begin
 	loop do
-
-		change_of_dir
+		Snake.new
 
 		if @pause
 			sleep(0.5)
@@ -167,6 +167,14 @@ begin
 		win.setpos(height-1,width-12)
 		win.addstr("Score: " + (game_score-(time_offset)/10.round(0)).to_s)
 
+		Snake::draw_snake
+		Snake::change_direction_detect
+		GamePlay::change_direction_detect
+		GamePlay::speed_of_game
+		GamePlay::change_direction_update
+		Snake::check_wall_collision
+		Snake::check_self_collision
+		Snake::check_food_eaten
 
 		sleep( (@dir == :left or @dir == :right) ? game_speed/2 : game_speed)
 
