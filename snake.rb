@@ -3,6 +3,40 @@ include Curses
 require 'time'
 require 'colored'
 
+class Snake
+
+
+	def check_wall_collision
+
+	end
+
+	def check_self_collision
+
+	end
+	def check_food_eaten
+
+	end
+	def draw_snake
+
+	end
+	def make_food
+
+	end
+end
+
+class GamePlay
+
+
+	def change_direction
+
+	end
+	def end_of_game
+
+	end
+	def speed_of_game
+
+	end
+end
 
 def change_of_dir
 	case getch
