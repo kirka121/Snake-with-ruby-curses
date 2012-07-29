@@ -44,7 +44,7 @@ curs_set(0)					#the cursor is invisible.
 title = "Kirka's Snake"
 pos_y = [5,4,3,2,1]
 pos_x = [1,1,1,1,1]
-@dir = :right #1 = up, 2 = down, 3 = left, 4 = right
+@dir = :right
 snake_len = 3
 width = cols
 height = lines
