@@ -4,66 +4,112 @@ require 'time'
 require 'colored'
 
 class Snake
-
+	def initialize
+		@pos_y = [5,4,3,2,1]
+		@pos_x = [1,1,1,1,1]
+		@snake_len = 3
+		@width = cols
+		@height = lines
+		@game_speed = 0.2
+		@game_score = 0
+		@display_speed = 0
+	end
 
 	def check_wall_collision
-
+		#check collision with border
+		if @pos_y[0] == cols-1 or @pos_y[0] == 0 or @pos_x[0] == lines-1 or @pos_x[0] == 0
+			GamePlay::end_of_game
+		end
 	end
 
 	def check_self_collision
-
+		#check collision with self
+		for i in 2..snake_len
+			if @pos_y[0] == @pos_y[i] and @pos_x[0] == @pos_x[i]
+				GamePlay::end_of_game
+			end
+		end
 	end
+
 	def check_food_eaten
-
+		#check if ate food
+		if @pos_y[0] == @food_y and @pos_x[0] == @food_x
+			make_food(@height,@width)
+			@snake_len += 1
+			@game_score += 1*@display_speed
+		end
 	end
+
 	def draw_snake
-
+		#remember the tail position during movement
+		t = @snake_len+1
+		while t > 0 do
+			@pos_x[t] = @pos_x[t-1]
+			@pos_y[t] = @pos_y[t-1]
+			t -= 1
+		end 
+		#draw the snake and its tail
+		for t in 0..@snake_len+1
+			setpos(@pos_x[t],@pos_y[t])
+			addstr(t == 1 ? "*" : "+")
+		end
 	end
-	def make_food
 
+	def make_food(max_h, max_w)
+		@food_y = rand(2..max_w-2)
+		@food_x = rand(1..max_h-2)
 	end
 end
 
 class GamePlay
-
-
-	def change_direction
-
+	def initialize
+		@dir = :right
+		@pause = false
+		@speed_incremented = false
 	end
+	def change_direction_detect
+		case getch
+		when ?Q, ?q
+			exit
+		when ?W, ?w
+			@dir = :up if @dir != :down
+		when ?S, ?s
+			@dir = :down if @dir != :up
+		when ?D, ?d
+			@dir = :right if @dir != :left
+		when ?A, ?a
+			@dir = :left if @dir != :right
+		when ?P, ?p
+			@pause = @pause ? false : true
+		end
+	def change_direction_update
+		case @dir
+		when :up    then @pos_x[0] -= 1
+		when :down  then @pos_x[0] += 1
+		when :left  then @pos_y[0] -= 1
+		when :right then @pos_y[0] += 1
+		end
+	end
+
 	def end_of_game
-
-	end
-	def speed_of_game
-
-	end
-end
-
-def change_of_dir
-	case getch
-	when ?Q, ?q
+		puts "You LOST".red
 		exit
-	when ?W, ?w
-		@dir = :up if @dir != :down
-	when ?S, ?s
-		@dir = :down if @dir != :up
-	when ?D, ?d
-		@dir = :right if @dir != :left
-	when ?A, ?a
-		@dir = :left if @dir != :right
-	when ?P, ?p
-		@pause = @pause ? false : true
+	end
+
+	def speed_of_game
+		#set speed of play, increment it automatically
+		if ((snake_len % 10 == 0) or (@time_offset%60 == 0))
+			if @speed_incremented == false
+				game_speed -= (game_speed*0.10) unless game_speed < 0.05
+				speed_incremented = true
+				display_speed += 1
+			end
+		else
+			speed_incremented = false
+		end
 	end
 end
 
-def end_game
-	puts "You LOST".red
-	exit
-end
-
-def make_food(max_h, max_w)
-	@food_y = rand(2..max_w-2)
-	@food_x = rand(1..max_h-2)
-end
 
 init_screen
 cbreak
@@ -82,12 +128,12 @@ snake_len = 3
 width = cols
 height = lines
 game_speed = 0.2
-make_food(height, width)
+make_food(lines, cols)
 start_time = Time.now.to_i
 speed_incremented = false
 display_speed = 0
 game_score = 0
-win = Window.new(height, width, 0, 0) #set the playfield the size of current terminal window
+win = Window.new(lines, cols, 0, 0) #set the playfield the size of current terminal window
 
 begin
 	loop do
@@ -121,59 +167,9 @@ begin
 		win.setpos(height-1,width-12)
 		win.addstr("Score: " + (game_score-(time_offset)/10.round(0)).to_s)
 
-		#change direction of movement
-		case @dir
-		when :up    then pos_x[0] -= 1
-		when :down  then pos_x[0] += 1
-		when :left  then pos_y[0] -= 1
-		when :right then pos_y[0] += 1
-		end
-
-		#remember the tail position during movement
-		t = snake_len+1
-		while t > 0 do
-			pos_x[t] = pos_x[t-1]
-			pos_y[t] = pos_y[t-1]
-			t -= 1
-		end 
-
-		#draw the snake and its tail
-		for t in 0..snake_len+1
-			setpos(pos_x[t],pos_y[t])
-			addstr(t == 1 ? "*" : "+")
-		end
-
-		#set speed of play, increment it automatically
-		if ((snake_len % 10 == 0) or (time_offset%60 == 0))
-			if speed_incremented == false
-				game_speed -= (game_speed*0.10) unless game_speed < 0.05
-				speed_incremented = true
-				display_speed += 1
-			end
-		else
-			speed_incremented = false
-		end
 
 		sleep( (@dir == :left or @dir == :right) ? game_speed/2 : game_speed)
 
-		#check collision with border
-		if pos_y[0] == cols-1 or pos_y[0] == 0 or pos_x[0] == lines-1 or pos_x[0] == 0
-			end_game
-		end
-
-		#check collision with self
-		for i in 2..snake_len
-			if pos_y[0] == pos_y[i] and pos_x[0] == pos_x[i]
-				end_game
-			end
-		end
-
-		#check if ate food
-		if pos_y[0] == @food_y and pos_x[0] == @food_x
-			make_food(height,width)
-			snake_len += 1
-			game_score += 1*display_speed
-		end
 		win.refresh
 		win.clear
 	end
