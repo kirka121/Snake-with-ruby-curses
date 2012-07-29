@@ -67,7 +67,9 @@ class GamePlay
 		@dir = :right
 		@pause = false
 		@speed_incremented = false
+		@game_speed = 0.2
 	end
+
 	def change_direction_detect
 		case getch
 		when ?Q, ?q
@@ -82,7 +84,12 @@ class GamePlay
 			@dir = :left if @dir != :right
 		when ?P, ?p
 			@pause = @pause ? false : true
+			if @pause
+				sleep(0.5)
+				next
+			end
 		end
+
 	def change_direction_update
 		case @dir
 		when :up    then @pos_x[0] -= 1
@@ -97,16 +104,20 @@ class GamePlay
 		exit
 	end
 
-	def speed_of_game
+	def proper_delay
+		sleep( (@dir == :left or @dir == :right) ? @game_speed/2 : @game_speed)
+	end
+
+	def speed_of_game(time_offset)
 		#set speed of play, increment it automatically
-		if ((snake_len % 10 == 0) or (@time_offset%60 == 0))
+		if ((snake_len % 10 == 0) or (time_offset%60 == 0))
 			if @speed_incremented == false
-				game_speed -= (game_speed*0.10) unless game_speed < 0.05
-				speed_incremented = true
+				@game_speed -= (@game_speed*0.10) unless @game_speed < 0.05
+				@speed_incremented = true
 				display_speed += 1
 			end
 		else
-			speed_incremented = false
+			@speed_incremented = false
 		end
 	end
 end
@@ -121,15 +132,6 @@ curs_set(0)					#the cursor is invisible.
 
 #starting position
 title = "Kirka's Snake"
-pos_y = [5,4,3,2,1]
-pos_x = [1,1,1,1,1]
-@dir = :right
-@pause = false
-snake_len = 3
-width = cols
-height = lines
-game_speed = 0.2
-make_food(lines, cols)
 start_time = Time.now.to_i
 speed_incremented = false
 display_speed = 0
@@ -139,11 +141,7 @@ win = Window.new(lines, cols, 0, 0) #set the playfield the size of current termi
 begin
 	loop do
 		Snake.new
-
-		if @pause
-			sleep(0.5)
-			next
-		end
+		GamePay.new
 
 		time_offset = Time.now.to_i - start_time
 
@@ -168,15 +166,13 @@ begin
 		win.addstr("Score: " + (game_score-(time_offset)/10.round(0)).to_s)
 
 		Snake::draw_snake
-		Snake::change_direction_detect
 		GamePlay::change_direction_detect
-		GamePlay::speed_of_game
+		GamePlay::speed_of_game(time_offset)
 		GamePlay::change_direction_update
 		Snake::check_wall_collision
 		Snake::check_self_collision
 		Snake::check_food_eaten
-
-		sleep( (@dir == :left or @dir == :right) ? game_speed/2 : game_speed)
+		GamePlay::proper_delay
 
 		win.refresh
 		win.clear
