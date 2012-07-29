@@ -9,17 +9,15 @@ def change_of_dir
 	when ?Q, ?q
 		exit
 	when ?W, ?w
-		@dir = 1 if @dir != 2
+		@dir = :up if @dir != :down
 	when ?S, ?s
-		@dir = 2 if @dir != 1
+		@dir = :down if @dir != :up
 	when ?D, ?d
-		@dir = 4 if @dir != 3
+		@dir = :right if @dir != :left
 	when ?A, ?a
-		@dir = 3 if @dir != 4
+		@dir = :left if @dir != :right
 	when ?P, ?p
-		#pause goes here...
-	else 
-		@dir
+		@pause = @pause ? false : true
 	end
 end
 
@@ -44,7 +42,8 @@ curs_set(0)					#the cursor is invisible.
 title = "Kirka's Snake"
 pos_y = [5,4,3,2,1]
 pos_x = [1,1,1,1,1]
-@dir = 4 #1 = up, 2 = down, 3 = left, 4 = right
+@dir = :right
+@pause = false
 snake_len = 3
 width = cols
 height = lines
@@ -54,10 +53,17 @@ start_time = Time.now.to_i
 speed_incremented = false
 display_speed = 0
 game_score = 0
-win = Window.new(height, width, (lines - height)/2, (cols - width)/2) #set the playfield the size of current terminal window
+win = Window.new(height, width, 0, 0) #set the playfield the size of current terminal window
 
 begin
 	loop do
+
+		change_of_dir
+
+		if @pause
+			sleep(0.5)
+			next
+		end
 
 		time_offset = Time.now.to_i - start_time
 
@@ -83,14 +89,10 @@ begin
 
 		#change direction of movement
 		case @dir
-		when 1
-			pos_x[0] -= 1
-		when 2
-			pos_x[0] += 1
-		when 3
-			pos_y[0] -= 1
-		when 4
-			pos_y[0] += 1
+		when :up    then pos_x[0] -= 1
+		when :down  then pos_x[0] += 1
+		when :left  then pos_y[0] -= 1
+		when :right then pos_y[0] += 1
 		end
 
 		#remember the tail position during movement
@@ -104,10 +106,8 @@ begin
 		#draw the snake and its tail
 		for t in 0..snake_len+1
 			setpos(pos_x[t],pos_y[t])
-			addstr(t == 1 ? "*" : "+")			
+			addstr(t == 1 ? "*" : "+")
 		end
-
-		change_of_dir
 
 		#set speed of play, increment it automatically
 		if ((snake_len % 10 == 0) or (time_offset%60 == 0))
@@ -120,7 +120,7 @@ begin
 			speed_incremented = false
 		end
 
-		sleep( @dir > 2 ? game_speed/2 : game_speed)
+		sleep( (@dir == :left or @dir == :right) ? game_speed/2 : game_speed)
 
 		#check collision with border
 		if pos_y[0] == cols-1 or pos_y[0] == 0 or pos_x[0] == lines-1 or pos_x[0] == 0
