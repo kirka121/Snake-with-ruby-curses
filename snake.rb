@@ -8,18 +8,16 @@ class Snake
 		@pos_y = [5,4,3,2,1]
 		@pos_x = [1,1,1,1,1]
 		@snake_len = 3
-		@width = cols
-		@height = lines
 		@game_speed = 0.2
 		@game_score = 0
 		@display_speed = 0
 		@game_score = 0
-		make_food(@height,@width)
+		make_food(lines,cols)
 	end
 
 	def check_wall_collision
 		#check collision with border
-		if @pos_y[0] == @width-1 or @pos_y[0] == 0 or @pos_x[0] == @height-1 or @pos_x[0] == 0
+		if @pos_y[0] == cols-1 or @pos_y[0] == 0 or @pos_x[0] == lines-1 or @pos_x[0] == 0
 			GamePlay.end_of_game
 		end
 	end
@@ -36,7 +34,7 @@ class Snake
 	def check_food_eaten(time_offset)
 		#check if ate food
 		if @pos_y[0] == @food_y and @pos_x[0] == @food_x
-			make_food(@height,@width)
+			make_food(lines,cols)
 			@snake_len += 1
 			@game_score += 1*@display_speed
 		end
@@ -115,9 +113,9 @@ class GamePlay < Snake
 		sleep( (@dir == :left or @dir == :right) ? @game_speed/2 : @game_speed)
 	end
 
-	def speed_of_game(time_offset)
+	def speed_of_game(time_off)
 		#set speed of play, increment it automatically
-		if ((@snake_len % 10 == 0) or (time_offset%60 == 0))
+		if ((@snake_len%10 == 0) or (time_off%60 == 0))
 			if @speed_incremented == false
 				@game_speed -= (@game_speed*0.10) unless @game_speed < 0.05
 				@speed_incremented = true
