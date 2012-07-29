@@ -18,8 +18,6 @@ def change_of_dir
 		@dir = :left if @dir != :right
 	when ?P, ?p
 		@pause = @pause ? false : true
-	else 
-		@dir
 	end
 end
 
