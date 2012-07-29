@@ -121,11 +121,7 @@ begin
 			speed_incremented = false
 		end
 
-		if @dir == 2 or @dir == 1
-			sleep(game_speed)
-		elsif @dir == 3 or @dir == 4
-			sleep(game_speed/2)
-		end
+		sleep( @dir > 2 ? game_speed/2 : game_speed)
 
 		#check collision with border
 		if pos_y[0] == cols-1 or pos_y[0] == 0 or pos_x[0] == lines-1 or pos_x[0] == 0
