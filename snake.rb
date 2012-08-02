@@ -21,7 +21,7 @@ class Snake
 	def check_wall_collision
 		#check collision with border
 		if @pos_y[0] == cols-1 or @pos_y[0] == 0 or @pos_x[0] == lines-1 or @pos_x[0] == 0
-			GamePlay.end_of_game
+			end_of_game
 		end
 	end
 
@@ -29,7 +29,7 @@ class Snake
 		#check collision with self
 		for i in 2..@snake_len
 			if @pos_y[0] == @pos_y[i] and @pos_x[0] == @pos_x[i]
-				GamePlay.end_of_game
+				end_of_game
 			end
 		end
 	end
@@ -41,7 +41,7 @@ class Snake
 			@snake_len += 1
 			@game_score += 1*@display_speed
 		end
-		setpos(cols-1,lines-12)
+		setpos(lines-1,cols-12)
 		addstr("Score: " + (@game_score-(time_offset)/10.round(0)).to_s)
 	end
 
@@ -62,13 +62,16 @@ class Snake
 		addstr("Snake Length: " + @snake_len.to_s)
 	end
 
-	def make_food(max_h, max_w)
-		@food_y = rand(2..max_w-2)
-		@food_x = rand(1..max_h-2)
+	def make_food(max_w, max_h)
+		@food_y = rand(2..max_h-2)
+		@food_x = rand(1..max_w-2)
 		setpos(@food_x, @food_y)
 		addstr("#")
-		setpos(20,cols)
-		addstr('food made')
+	end
+
+	def display_food
+		setpos(@food_x, @food_y)
+		addstr("#")
 	end
 
 
@@ -86,9 +89,12 @@ class Snake
 			@dir = :left if @dir != :right
 		when ?P, ?p
 			@pause = @pause ? false : true
-			if @pause
+			while @pause
 				sleep(0.5)
-				#next
+				case getch when ?P, ?p
+					@pause = false
+				end
+				next
 			end
 		end
 	end
@@ -122,7 +128,7 @@ class Snake
 		else
 			@speed_incremented = false
 		end
-		setpos(cols-1,3)
+		setpos(lines-1,3)
 		addstr("Speed: " + @display_speed.to_s)
 	end
 end
@@ -141,10 +147,10 @@ start_time = Time.now.to_i
 display_speed = 0
 win = Window.new(lines, cols, 0, 0) #set the playfield the size of current terminal window
 snake = Snake.new
+snake.make_food(cols-1,lines-1)
 
 begin
 	loop do
-
 		time_offset = Time.now.to_i - start_time
 
 		win.box("|", "-")
@@ -161,6 +167,7 @@ begin
 		snake.change_direction_update
 		snake.check_wall_collision
 		snake.check_self_collision
+		snake.display_food
 		snake.check_food_eaten(time_offset)
 		snake.proper_delay
 
