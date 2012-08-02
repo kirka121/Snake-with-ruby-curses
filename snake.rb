@@ -13,6 +13,9 @@ class Snake
 		@display_speed = 0
 		@game_score = 0
 		make_food(lines,cols)
+		@dir = :right
+		@pause = false
+		@speed_incremented = false
 	end
 
 	def check_wall_collision
@@ -24,7 +27,7 @@ class Snake
 
 	def check_self_collision
 		#check collision with self
-		for i in 2..snake_len
+		for i in 2..@snake_len
 			if @pos_y[0] == @pos_y[i] and @pos_x[0] == @pos_x[i]
 				GamePlay.end_of_game
 			end
@@ -38,7 +41,7 @@ class Snake
 			@snake_len += 1
 			@game_score += 1*@display_speed
 		end
-		setpos(height-1,width-12)
+		setpos(cols-1,lines-12)
 		addstr("Score: " + (@game_score-(time_offset)/10.round(0)).to_s)
 	end
 
@@ -64,15 +67,10 @@ class Snake
 		@food_x = rand(1..max_h-2)
 		setpos(@food_x, @food_y)
 		addstr("#")
+		setpos(20,cols)
+		addstr('food made')
 	end
-end
 
-class GamePlay < Snake
-	def initialize
-		@dir = :right
-		@pause = false
-		@speed_incremented = false
-	end
 
 	def change_direction_detect
 		case getch
@@ -124,7 +122,7 @@ class GamePlay < Snake
 		else
 			@speed_incremented = false
 		end
-		setpos(height-1,3)
+		setpos(cols-1,3)
 		addstr("Speed: " + @display_speed.to_s)
 	end
 end
@@ -142,11 +140,10 @@ title = "Kirka's Snake"
 start_time = Time.now.to_i
 display_speed = 0
 win = Window.new(lines, cols, 0, 0) #set the playfield the size of current terminal window
+snake = Snake.new
 
 begin
 	loop do
-		snake = Snake.new
-		game = GamePlay.new
 
 		time_offset = Time.now.to_i - start_time
 
@@ -159,13 +156,13 @@ begin
 		win.addstr("Time: " + time_offset.to_s)
 
 		snake.draw_snake
-		game.change_direction_detect
-		game.speed_of_game(time_offset)
-		game.change_direction_update
+		snake.change_direction_detect
+		snake.speed_of_game(time_offset)
+		snake.change_direction_update
 		snake.check_wall_collision
 		snake.check_self_collision
 		snake.check_food_eaten(time_offset)
-		game.proper_delay
+		snake.proper_delay
 
 		win.refresh
 		win.clear
