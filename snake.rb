@@ -12,7 +12,7 @@ class Snake
 		@game_score = 0
 		@display_speed = 0
 		@game_score = 0
-		make_food(lines,cols)
+		make_food(cols-1,lines-1)
 		@dir = :right
 		@pause = false
 		@speed_incremented = false
@@ -37,7 +37,7 @@ class Snake
 	def check_food_eaten(time_offset)
 		#check if ate food
 		if @pos_y[0] == @food_y and @pos_x[0] == @food_x
-			make_food(lines,cols)
+			make_food(lines-1,cols-1)
 			@snake_len += 1
 			@game_score += 1*@display_speed
 		end
@@ -63,8 +63,8 @@ class Snake
 	end
 
 	def make_food(max_w, max_h)
-		@food_y = rand(2..max_h-2)
-		@food_x = rand(1..max_w-2)
+		@food_y = rand(2..max_h)
+		@food_x = rand(1..max_w)
 		setpos(@food_x, @food_y)
 		addstr("#")
 	end
@@ -88,14 +88,18 @@ class Snake
 		when ?A, ?a
 			@dir = :left if @dir != :right
 		when ?P, ?p
-			@pause = @pause ? false : true
-			while @pause
-				sleep(0.5)
-				case getch when ?P, ?p
-					@pause = false
-				end
-				next
+			pause
+		end
+	end
+
+	def pause
+		@pause = @pause ? false : true
+		while @pause
+			sleep(0.5)
+			case getch when ?P, ?p
+				@pause = false
 			end
+			next
 		end
 	end
 
@@ -147,7 +151,7 @@ start_time = Time.now.to_i
 display_speed = 0
 win = Window.new(lines, cols, 0, 0) #set the playfield the size of current terminal window
 snake = Snake.new
-snake.make_food(cols-1,lines-1)
+snake.make_food(lines-1,cols-1)
 
 begin
 	loop do
