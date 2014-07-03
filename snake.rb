@@ -1,9 +1,13 @@
 require 'curses'
-include Curses
+include Curses 								#use include if dont want to prefix library commands with class name
 require 'time'
 
 class Snake
-	def initialize
+	attr_accessor :end_game, :pause 		#public accessor
+	@@test = "something" 					#class variable
+	@test2 = "something else" 				#instance variables
+
+	def initialize							 #constructor
 		@win = Window.new(lines, cols, 0, 0) #set the playfield the size of current terminal window
 		@title = "Kirka's Snake"
 		@pos_y = [5,4,3,2,1]
@@ -16,10 +20,12 @@ class Snake
 		@speed_incremented = false
 		@display_speed = 0
 		@game_score = 0
+		@end_game = false
+		@ticks = 0
 	end
 	
 	def setup_window(border_wall, border_roof)
-		@time_offset = Time.now.to_i - @start_time
+		@time_offset = Time.now.to_i - @start_time 		#time does not stop ticking when paused. this is a bit of logic. we use time only for score.
 		@win.box(border_wall, border_roof)				# border
 
 		@win.setpos(@food_x, @food_y)
@@ -32,7 +38,7 @@ class Snake
 		@win.addstr(@title)
 
 		@win.setpos(0,cols-12)
-		@win.addstr("Time: " + @time_offset.to_s)
+		@win.addstr("Ticks: " + @ticks.to_s)
 
 		@win.setpos(lines-1,3)
 		@win.addstr("Speed: " + @display_speed.to_s)
@@ -103,19 +109,22 @@ class Snake
 			@speed_incremented = false
 		end
 
+		if !@pause
+			@ticks += 1
+		end
 		sleep( (@dir == :left or @dir == :right) ? @game_speed/2 : @game_speed) #actually acount for speed. the sleep here instroduces FPS.
 	end
 
 	def collision?
 		#check collision with border
 		if @pos_y[0] == cols-1 or @pos_y[0] == 0 or @pos_x[0] == lines-1 or @pos_x[0] == 0
-			end_game
+			@end_game = true
 		end
 
 		#check collision with self
 		for i in 2..@snake_len
 			if @pos_y[0] == @pos_y[i] and @pos_x[0] == @pos_x[i]
-				end_game
+				@end_game = true
 			end
 		end
 	end
@@ -134,17 +143,29 @@ class Snake
 		@win.clear
 	end
 
-	def pause?
-		change_of_dir?
-		if @pause
-			sleep(0.5)			# bug. doesnt pause. need to implement next properly.
-			pause?
-		end
-	end
+end
 
-	def end_game
-		puts "You LOST"		#doesnt work atm.
-		exit
+def end_game
+	lost_string = "You LOST"
+
+	win = Window.new(lines, cols, 0, 0) 	#set the playfield the size of current terminal window
+		
+	win.refresh
+	win.clear
+
+	win.box("|", "-")						# border
+
+	win.setpos(4, 4)
+	win.addstr(lost_string)		
+
+	exit
+end
+
+def pause?
+	@snake.change_of_dir?
+	if @snake.pause
+		sleep(0.5)			
+		pause?
 	end
 end
 
@@ -158,9 +179,7 @@ curs_set(0)					#the cursor is invisible.
 
 begin
 	loop do
-		@snake.change_of_dir?
-
-		@snake.pause?
+		pause?
 
 		@snake.setup_window("|","-")
 
@@ -175,7 +194,9 @@ begin
 		@snake.ate_food?
 
 		@snake.refresh_window
+
+		end_game if @snake.end_game
 	end
 ensure
-	close_screen
+	close_screen	
 end
