@@ -20,10 +20,10 @@ class Snake
 	
 	def setup_window(border_wall, border_roof)
 		@time_offset = Time.now.to_i - @start_time
-		@win.box(border_wall, border_roof)
+		@win.box(border_wall, border_roof)				# border
 
 		@win.setpos(@food_x, @food_y)
-		@win.addstr("*")
+		@win.addstr("*")								#draw food
 
 		@win.setpos(0,3)
 		@win.addstr("Snake Length: " + @snake_len.to_s)
@@ -42,29 +42,31 @@ class Snake
 	end
 
 	def make_food(max_h, max_w)
+		#generate food.
 		@food_y = rand(2..max_w-2)
 		@food_x = rand(1..max_h-2)
 	end
 
 	def change_of_dir?
+		#check change of movement
 		case getch
-		when ?Q, ?q
-			exit
-		when ?W, ?w
-			@dir = :up if @dir != :down
-		when ?S, ?s
-			@dir = :down if @dir != :up
-		when ?D, ?d
-			@dir = :right if @dir != :left
-		when ?A, ?a
-			@dir = :left if @dir != :right
-		when ?P, ?p
-			@pause = @pause ? false : true
+			when ?Q, ?q
+				exit
+			when ?W, ?w
+				@dir = :up if @dir != :down
+			when ?S, ?s
+				@dir = :down if @dir != :up
+			when ?D, ?d
+				@dir = :right if @dir != :left
+			when ?A, ?a
+				@dir = :left if @dir != :right
+			when ?P, ?p
+				@pause = @pause ? false : true		#shorthand if. fun stuff.
 		end
 	end
 
 	def change_of_dir!
-		#change direction of movement
+		#account for change of direction if happened
 		case @dir
 			when :up then @pos_x[0] -= 1
 			when :down  then @pos_x[0] += 1
@@ -101,7 +103,7 @@ class Snake
 			@speed_incremented = false
 		end
 
-		sleep( (@dir == :left or @dir == :right) ? @game_speed/2 : @game_speed)
+		sleep( (@dir == :left or @dir == :right) ? @game_speed/2 : @game_speed) #actually acount for speed. the sleep here instroduces FPS.
 	end
 
 	def collision?
@@ -134,13 +136,13 @@ class Snake
 
 	def pause?
 		if @pause
-			sleep(0.5)
+			sleep(0.5)			# bug. doesnt pause. need to implement next properly.
 			#next
 		end
 	end
 
 	def end_game
-		puts "You LOST"
+		puts "You LOST"		#doesnt work atm.
 		exit
 	end
 end
