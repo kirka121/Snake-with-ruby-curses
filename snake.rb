@@ -135,9 +135,10 @@ class Snake
 	end
 
 	def pause?
+		change_of_dir?
 		if @pause
 			sleep(0.5)			# bug. doesnt pause. need to implement next properly.
-			#next
+			pause?
 		end
 	end
 
